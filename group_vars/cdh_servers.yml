@@ -15,6 +15,12 @@ cdh_services:
     dfs_name_dir_list: /dfs/nn
     dfs_journalnode_edits_dir: /dfs/jn
 
+  - type: kudu
+    m_fs_data_dirs: "/var/lib/kudu/master"
+    m_fs_wal_dir: "/var/lib/kudu/master"
+    t_fs_data_dirs: "/var/lib/kudu/tserver"
+    t_fs_wal_dir": "/var/lib/kudu/tserver"
+
   - type: hive
 
   - type: hue
