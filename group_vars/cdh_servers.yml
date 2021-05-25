@@ -19,7 +19,7 @@ cdh_services:
     m_fs_data_dirs: "/var/lib/kudu/master"
     m_fs_wal_dir: "/var/lib/kudu/master"
     t_fs_data_dirs: "/var/lib/kudu/tserver"
-    t_fs_wal_dir": "/var/lib/kudu/tserver"
+    t_fs_wal_dir: "/var/lib/kudu/tserver"
 
   - type: hive
 
