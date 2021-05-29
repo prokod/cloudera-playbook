@@ -11,6 +11,9 @@
       {% if 'role_ref_names' in hostvars[host] %}
       ,"roleRefNames" : [ "{{ hostvars[host]['role_ref_names'] }}" ]
       {% endif %}
+      {%- if 'rack_id' in hostvars[host] -%}
+      ,"rackId" : [ "{{ hostvars[host]['rack_id'] }}" ]
+      {%- endif -%}
     }
     {% endif %}
     {% endfor %}
@@ -29,4 +32,15 @@
     {% endfor %}
   {% endfor %}
   ]
+  {%- if krb5_kdc_type != 'none'
+        and cluster_version_cm_major | int >= 6 -%}
+  , "enableKerberos": {
+    {%- if cluster.security.tls | default(false) -%}
+    "datanodeTransceiverPort": 9866,
+    "datanodeWebPort": 9864
+    {%- else -%}
+    "datanodeTransceiverPort": 1004,
+    "datanodeWebPort": 1006
+    {%- endif -%}
+  }
 }
