@@ -15,5 +15,5 @@
 ---
 
 preload_parcels:
-  - "{{ scm_parcel_repositories }}/CDH-6.3.2-1.cdh6.3.2.p4071.7339474-el7.parcel"
-  - "{{ scm_parcel_repositories }}/CDH-6.3.2-1.cdh6.3.2.p4071.7339474-el7.parcel.sha1"
+  - "{{ scm_parcel_repositories | first }}/CDH-6.3.2-1.cdh6.3.2.p4071.7339474-el7.parcel"
+  - "{{ scm_parcel_repositories | first }}/CDH-6.3.2-1.cdh6.3.2.p4071.7339474-el7.parcel.sha1"
