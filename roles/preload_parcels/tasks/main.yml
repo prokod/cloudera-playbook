@@ -1,3 +1,5 @@
+- setup:
+
 - name: Ensure Parcel Repo directory is present
   ansible.builtin.file:
     path: /opt/cloudera/parcel-repo
