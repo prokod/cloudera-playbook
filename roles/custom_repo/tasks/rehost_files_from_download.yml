@@ -68,7 +68,7 @@
 
 - name: Set Cloudera Manager Base Repo if included in rehosting list
   when: custom_repo_rehost_files | select('search', 'tar.gz') | list | select('search', '/cm') | list | length > 0
-  var:
+  vars:
     cloudera_archive_base_url:          "http://{{ groups['custom_repo'] | first }}"
   ansible.builtin.set_fact:
     scm_parcel_repositories:            "{{ cloudera_archive_base_url }}{{ scm_parcel_repositories | urlsplit('path') }}"
