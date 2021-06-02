@@ -71,9 +71,9 @@
   vars:
     cloudera_archive_base_url:          "http://{{ groups['custom_repo'] | first }}"
   ansible.builtin.set_fact:
-    scm_parcel_repositories:            "{{ cloudera_archive_base_url }}{{ scm_parcel_repositories | urlsplit('path') }}"
-    scm_repo_url:                       "{{ cloudera_archive_base_url }}{{ scm_repo_url | urlsplit('path') }}"
-    scm_repo_gpgkey:                    "{{ cloudera_archive_base_url }}{{ scm_repo_gpgkey | urlsplit('path') }}"
+    scm_parcel_repositories:            "{{ cloudera_archive_base_url }}{{ scm_parcel_repositories | urlsplit('path') | first }}"
+    scm_repo_url:                       "{{ cloudera_archive_base_url }}{{ scm_repo_url | urlsplit('path') | first }}"
+    scm_repo_gpgkey:                    "{{ cloudera_archive_base_url }}{{ scm_repo_gpgkey | urlsplit('path') | first }}"
   delegate_to: "{{ __play_host }}"
   delegate_facts: true
   loop: "{{ groups.scm_server + groups.cdh_servers }}"
