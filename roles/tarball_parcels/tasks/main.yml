@@ -1,4 +1,4 @@
-# - setup:
+- setup:
 
 # - name: Ensure Parcel Repo directory is present
 #   ansible.builtin.file:

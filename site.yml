@@ -12,6 +12,7 @@
 
 - name: Generate parcels archives to be used by install parcels tasks
   hosts: localhost
+  connection: local
   become: yes
   roles:
     - tarball_parcels
