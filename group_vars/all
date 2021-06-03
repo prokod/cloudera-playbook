@@ -89,7 +89,7 @@ configs_by_version:
       - "{{ cloudera_archive_protocol }}{{ cloudera_archive_authn }}@{{ cloudera_archive }}/p/cdh6/{{ cluster_version_cdh }}/parcels"
       #- "https://9716eed6-1316-469b-be4e-749b42d53058:f7687225cc3b@archive.cloudera.com/p/accumulo-c5/parcels/latest/"
       #- "https://archive.cloudera.com/p/accumulo6/6.1.0/parcels/"
-      - "https://archive.cloudera.com/p/spark2/parcels/latest/"
+      - "{{ cloudera_archive_protocol }}{{ cloudera_archive_authn }}@{{ cloudera_archive }}/p/spark2/parcels/latest/"
     parcel_distro: el7.parcel
     scm_prepare_database_script_path: "/opt/cloudera/cm/schema/scm_prepare_database.sh"
   "7":
