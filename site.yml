@@ -10,6 +10,15 @@
   tags:
     - preload_parcels
 
+- name: Generate parcels archives to be used by install parcels tasks
+  hosts: localhost
+  become: yes
+  roles:
+    - tarball_parcels
+  tags:
+    - tarball_parcels
+    - custom_repo
+
 - name: Install custom parcel repository
   hosts: custom_repo
   become: yes

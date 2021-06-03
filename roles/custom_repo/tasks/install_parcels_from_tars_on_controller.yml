@@ -16,12 +16,16 @@
 
 - name: Work out temp and repo paths
   set_fact:
+    # example: /tmp/cdh-6.3.2-parcels/
     temp_dir: "{{ local_temp_dir }}/{{ repo_tar_file | regex_replace('.tar.gz','') }}"
+    # example: /var/www/html/cdh/6.3.2/parcels
     repo_dir: /var/www/html/{{ repo_tar_file | regex_replace("-([0-9\.]+)-parcels.tar.gz", "/\1/parcels") }}
 
 - name: Upload and extract parcel tar file
   ansible.builtin.unarchive:
+    # example: repo/cdh-6.3.2-parcels.tar.gz
     src: "{{ repo_tar_local_dir }}/{{ repo_tar_file }}"
+    # example: /tmp
     dest: "{{ local_temp_dir }}"
     keep_newer: "{{ keep_newer }}"
 

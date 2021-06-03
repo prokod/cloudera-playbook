@@ -17,3 +17,5 @@
 preload_parcels:
   - "{{ scm_parcel_repositories | first }}/CDH-6.3.2-1.cdh6.3.2.p4071.7339474-{{ parcel_distro }}"
   - "{{ scm_parcel_repositories | first }}/CDH-6.3.2-1.cdh6.3.2.p4071.7339474-{{ parcel_distro }}.sha1"
+  - "{{ scm_parcel_repositories | first }}/CDH-6.3.2-1.cdh6.3.2.p4071.7339474-{{ parcel_distro }}.sha256"
+  - "{{ scm_parcel_repositories | first }}/manifest.json"
