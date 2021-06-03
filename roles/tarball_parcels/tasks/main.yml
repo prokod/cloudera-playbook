@@ -16,7 +16,7 @@
 - debug: var=the_zips
   vars:
     the_zips: >-
-     {{ parcel_repositories.content | regex_findall(".*({{ parcel_distro }}\.?(sha|sha1|sha256)?|manifest.json)") }}
+     {{ parcel_repositories.content | regex_findall('.*(' + parcel_distro + '\.?(sha|sha1|sha256)?|manifest.json)') }}
 
 # Cloudera Manager expects file hashes to be .sha extension
 # - name: Request Async Download of Parcels to Cloudera Manager Parcel Repo
