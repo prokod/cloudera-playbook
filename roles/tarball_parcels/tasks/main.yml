@@ -21,7 +21,7 @@
   debug: var=the_zips
   vars:
     the_zips: >-
-     {{ parcel_repositories.results | map(attribute='content') | map('regex_findall', pattern | string ) | list }}
+     {{ parcel_repositories.results | map(attribute='content') | map('regex_findall', pattern | string ) | map('first') | list }}
 
 # Cloudera Manager expects file hashes to be .sha extension
 # - name: Request Async Download of Parcels to Cloudera Manager Parcel Repo
