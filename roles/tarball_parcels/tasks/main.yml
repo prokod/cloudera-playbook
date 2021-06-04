@@ -5,7 +5,8 @@
 #     path: /opt/cloudera/parcel-repo
 #     state: directory
 
-- uri:
+- name: Get Parcel repositories content
+  uri:
     url: "{{ __parcel_repository_item }}"
     return_content: yes
   register: parcel_repositories
@@ -13,9 +14,11 @@
   loop_control:
     loop_var: __parcel_repository_item
 
-- set_fact: pattern="{{ '.*(' ~ parcel_distro ~ '\.?(sha|sha1|sha256)?|manifest.json)' }}"
-- debug: var=pattern
-- debug: var=the_zips
+- name: Regex pattern for procel distro only filtrering
+  set_fact: pattern="{{ 'href="((.*?cdh' ~ cluster_version_cdh_version ~ '.*?' ~ parcel_distro ~ '){1}\.?(sha|sha1|sha256)?|manifest.json){1}"' }}"
+
+- name: a
+  debug: var=the_zips
   vars:
     the_zips: >-
      {{ parcel_repositories.results | map(attribute='content') | map('regex_findall', pattern | string ) | list }}

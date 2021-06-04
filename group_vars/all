@@ -41,7 +41,9 @@ ad_site: Default-First-Site-Name
 ## ------------------------------------------------------------------------------------------------------------
 
 # Version of CDH to install
-cluster_version_cdh: 6.3.2-patch4071
+cluster_version_cdh_version: 6.3.2
+cluster_version_cdh_patch: patch4071
+cluster_version_cdh: "{{ cluster_version_cdh_version }}-{{ cluster_version_cdh_patch }}"
 #cluster_version_cdh: 7.x
 
 # Version of Cloudera Manager to install
