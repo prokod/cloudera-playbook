@@ -15,7 +15,7 @@
 ---
 
 local_temp_dir: /tmp
-repo_tar_stage_local_dir: repo
+repo_tarball_staging_local_dir: repo
 
 preload_parcels:
   - "{{ scm_parcel_repositories | first }}/CDH-6.3.2-1.cdh6.3.2.p4071.7339474-{{ parcel_distro }}"
