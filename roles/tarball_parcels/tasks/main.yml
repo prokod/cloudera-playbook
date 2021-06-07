@@ -29,7 +29,7 @@
 - name: b
   set_fact:
     parcel_repos_files: >-
-         (
+       {{(
            dict(
                  parcel_repos_keys | zip(parcel_repositories.results | map(attribute='content') | map('regex_findall', pattern1 | string ) | list)
                 ) |
@@ -42,7 +42,7 @@
                  dict(
                        parcel_repos_keys | zip(parcel_repositories.results | map(attribute='content') | map('regex_findall', pattern3 | string ) | list)
                       )
-                 )
+                 )}}
 
 - name: a
   debug: var=parcel_repos_files
