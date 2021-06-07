@@ -23,35 +23,21 @@
 - name: Regex pattern for filtering parcel distro parcels
   set_fact: pattern3="{{ 'href\=\"((?:.*?cdh' ~ cluster_version_cdh_version ~ '.*?' ~ parcel_distro ~ ')\.?(?:sha|sha1|sha256)?)\"' }}"
 
-- name: extract repo keys (url as key)
+- name: Extract repo keys (url as key)
   set_fact: parcel_repos_keys="{{ parcel_repositories.results | map(attribute='url') | list }}"
 
-- name: b
+- name: Compose repos files dictionary
   set_fact:
     parcel_repos_files: >-
-       {{(
-           dict(
-                 parcel_repos_keys | zip(parcel_repositories.results | map(attribute='content') | map('regex_findall', pattern1 | string ) | list)
-                ) |
-           combine(
-                 dict(
-                       parcel_repos_keys | zip(parcel_repositories.results | map(attribute='content') | map('regex_findall', pattern2 | string ) | list)
-                      )
-                 , list_merge='append_rp')) |
-           combine(
-                 dict(
-                       parcel_repos_keys | zip(parcel_repositories.results | map(attribute='content') | map('regex_findall', pattern3 | string ) | list)
-                      )
-                 , list_merge='append_rp')}}
-
-- name: a
-  debug: var=parcel_repos_files
+       {{ (dict(parcel_repos_keys | zip(parcel_repositories.results | map(attribute='content') | map('regex_findall', pattern1 | string ) | list))
+         | combine(dict(parcel_repos_keys | zip(parcel_repositories.results | map(attribute='content') | map('regex_findall', pattern2 | string ) | list)), list_merge='append_rp'))
+         | combine(dict(parcel_repos_keys | zip(parcel_repositories.results | map(attribute='content') | map('regex_findall', pattern3 | string ) | list)), list_merge='append_rp') 
+         | dict2items(key_name='name', key_value='files') }}
 
 # Cloudera Manager expects file hashes to be .sha extension
 # - name: Request Async Download of Parcels to Cloudera Manager Parcel Repo
-#   when: preload_parcels
 #   register: __infra_download_parcels_results
-#   loop: "{{ preload_parcels | select('match', '.*parcel.*') | list }}"
+#   loop: "{{ parcel_repos_files | select('match', '.*parcel.*') | list }}"
 #   loop_control:
 #     loop_var: __parcel_download_item
 #   async: 3600
