@@ -14,14 +14,29 @@
   loop_control:
     loop_var: __parcel_repository_item
 
-- name: Regex pattern for procel distro only filtrering
-  set_fact: pattern="{{ 'href="((.*?cdh' ~ cluster_version_cdh_version ~ '.*?' ~ parcel_distro ~ '){1}\.?(sha|sha1|sha256)?|manifest.json){1}"' }}"
+- name: Regex pattern for filtering parcel distro repo manifest (case 1)
+  set_fact: pattern1="{{ '(?:.*?cdh' ~ cluster_version_cdh_version ~ '.*?\n)+(?:.*?\n)*.*?href\=\"(manifest.json)\"' }}"
+
+- name: Regex pattern for filtering parcel distro repo manifest (case 2)
+  set_fact: pattern2="{{ '(?:.*?\n)*.*?href\=\"(manifest.json)\".*?\n(?:.*?\n)*(?:.*?cdh' ~ cluster_version_cdh_version ~ '.*?\n)+' }}"
+
+- name: Regex pattern for filtering parcel distro parcels
+  set_fact: pattern3="{{ 'href\=\"((?:.*?cdh' ~ cluster_version_cdh_version ~ '.*?' ~ parcel_distro ~ ')\.?(?:sha|sha1|sha256)?)\"' }}"
+
+- name: extract repo keys (url as key)
+  set_fact: parcel_repos_keys="{{ parcel_repositories.results | map(attribute='url') | list }}"
+
+- name: b
+  set_fact:
+    parcel_repos_files: >-
+      {{ (dict(parcel_repos_keys | zip(parcel_repositories.results | map(attribute='content') | map('regex_findall', pattern1 | string ) | list) |
+         combine(
+         dict(parcel_repos_keys | zip(parcel_repositories.results | map(attribute='content') | map('regex_findall', pattern2 | string ) | list))) |
+         combine(
+         dict(parcel_repos_keys | zip(parcel_repositories.results | map(attribute='content') | map('regex_findall', pattern3 | string ) | list)) }}
 
 - name: a
-  debug: var=the_zips
-  vars:
-    the_zips: >-
-     {{ parcel_repositories.results | map(attribute='content') | map('regex_findall', pattern | string ) | map('first') | list }}
+  debug: var=parcel_repos_files
 
 # Cloudera Manager expects file hashes to be .sha extension
 # - name: Request Async Download of Parcels to Cloudera Manager Parcel Repo
