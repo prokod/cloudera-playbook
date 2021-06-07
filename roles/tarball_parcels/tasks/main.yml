@@ -32,31 +32,31 @@
        {{ (dict(parcel_repos_keys | zip(parcel_repositories.results | map(attribute='content') | map('regex_findall', pattern1 | string ) | list))
          | combine(dict(parcel_repos_keys | zip(parcel_repositories.results | map(attribute='content') | map('regex_findall', pattern2 | string ) | list)), list_merge='append_rp'))
          | combine(dict(parcel_repos_keys | zip(parcel_repositories.results | map(attribute='content') | map('regex_findall', pattern3 | string ) | list)), list_merge='append_rp') 
-         | dict2items(key_name='name', key_value='files') }}
+         | dict2items(key_name='name', value_name='files') }}
 
 # Cloudera Manager expects file hashes to be .sha extension
-# - name: Request Async Download of Parcels to Cloudera Manager Parcel Repo
-#   register: __infra_download_parcels_results
-#   loop: "{{ parcel_repos_files | select('match', '.*parcel.*') | list }}"
-#   loop_control:
-#     loop_var: __parcel_download_item
-#   async: 3600
-#   poll: 0
-#   ansible.builtin.get_url:
-#     url: "{{ __parcel_download_item }}"
-#     dest: "/opt/cloudera/parcel-repo/{{ __parcel_download_item | urlsplit('path') | basename | replace('.sha1', '.sha') }}"
+# example of item.0.name: "https://archive.cloudera.com/p/cdh6/6.3.2-patch4071/parcels/"
+- name: Request Async Download of Parcels to tarball/s staging dir/s
+  register: __download_parcels_results
+  loop: "{{ parcel_repos_files | subelements('files') }}"
+  loop_control:
+    loop_var: __parcel_download_item
+  async: 3600
+  poll: 0
+  ansible.builtin.get_url:
+    url: "{{ __parcel_download_item.0.name }}{{ __parcel_download_item.1 }}"
+    dest: "{{ local_temp_dir }}/{{ repo_tar_stage_local_dir }}/{{  __parcel_download_item.0.name | regex_replace('.*\/(.*?)\/([0-9\.]+).*', '\1-\2-parcels') }}"
 
-# - name: Track async downloads to completion  [ This may take a while if your files are very large or far away ]
-#   when : preload_parcels
-#   loop: "{{ __infra_download_parcels_results.results }}"
-#   loop_control:
-#     loop_var: __download_async_item
-#   register: __async_download_results
-#   until: __async_download_results.finished is defined and __async_download_results.finished
-#   delay: 15
-#   retries: 300
-#   async_status:
-#     jid: "{{ __download_async_item.ansible_job_id }}"
-#   failed_when:
-#     - __download_async_item.failed == True
-#     - __download_async_item.finished != 1
+- name: Track async downloads to completion  [ This may take a while if your files are very large or far away ]
+  loop: "{{ __download_parcels_results.results }}"
+  loop_control:
+    loop_var: __download_async_item
+  register: __async_download_results
+  until: __async_download_results.finished is defined and __async_download_results.finished
+  delay: 15
+  retries: 300
+  async_status:
+    jid: "{{ __download_async_item.ansible_job_id }}"
+  failed_when:
+    - __download_async_item.failed == True
+    - __download_async_item.finished != 1
