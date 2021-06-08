@@ -1,10 +1,5 @@
 - setup:
 
-# - name: Ensure Parcel Repo directory is present
-#   ansible.builtin.file:
-#     path: /opt/cloudera/parcel-repo
-#     state: directory
-
 - name: Get Parcel repositories content
   uri:
     url: "{{ __parcel_repository_item }}"
@@ -26,6 +21,25 @@
 - name: Extract repo keys (url as key)
   set_fact: parcel_repos_keys="{{ parcel_repositories.results | map(attribute='url') | list }}"
 
+# Dictionary example:
+# {
+#    "parcel_repos_files":[
+#       {
+#          "files":[
+#             "manifest.json",
+#             "CDH-6.3.2-1.cdh6.3.2.p4071.7339474-el7.parcel",
+#             "CDH-6.3.2-1.cdh6.3.2.p4071.7339474-el7.parcel.sha1",
+#             "CDH-6.3.2-1.cdh6.3.2.p4071.7339474-el7.parcel.sha256"
+#          ],
+#          "name":"https://archive.cloudera.com/p/cdh6/6.3.2-patch4071/parcels/"
+#       },
+#       {
+#          "files":[            
+#          ],
+#          "name":"https://archive.cloudera.com/p/spark2/parcels/latest/"
+#       }
+#    ]
+# }
 - name: Compose repos files dictionary
   set_fact:
     parcel_repos_files: >-
@@ -34,10 +48,18 @@
          | combine(dict(parcel_repos_keys | zip(parcel_repositories.results | map(attribute='content') | map('regex_findall', pattern3 | string ) | list)), list_merge='append_rp') 
          | dict2items(key_name='name', value_name='files') }}
 
-- debug: msg="{{ parcel_repos_files | subelements('files') }}"
+# Example of dest dir: "{{ local_temp_dir }}/{{ repo_tarball_staging_local_dir }}/cdh6-6.3.2-parcels/cdh6/6.3.2-patch4071/parcels
+- name: Ensure staged Parcel Repo directories are present
+  ansible.builtin.file:
+    path: >-
+       {{ local_temp_dir }}/{{ repo_tarball_staging_local_dir }}/{{ __parcel_download_item.0.name | regex_replace("^(.*)\/(.*?)\/([0-9\.]+)(.*)$", "\2-\3-parcels") }}/{{ __parcel_download_item.0.name | regex_replace("^(.*?)\/p\/(.*)\/$", "\2") }}
+    state: directory
+  loop: "{{ parcel_repos_files | subelements('files') }}"
+  loop_control:
+    loop_var: __parcel_item
 
-# Cloudera Manager expects file hashes to be .sha extension
-# example of item.0.name: "https://archive.cloudera.com/p/cdh6/6.3.2-patch4071/parcels/"
+# Example of item.0.name: "https://archive.cloudera.com/p/cdh6/6.3.2-patch4071/parcels/"
+# Example of dest dir: "{{ local_temp_dir }}/{{ repo_tarball_staging_local_dir }}/cdh6-6.3.2-parcels/cdh6/6.3.2-patch4071/parcels
 - name: Request Async Download of Parcels to tarball/s staging dir/s
   register: __download_parcels_results
   loop: "{{ parcel_repos_files | subelements('files') }}"
@@ -49,9 +71,7 @@
     url: >-
       {{ (__parcel_download_item.0.name ~ __parcel_download_item.1) | regex_replace("^(.*?)\:\/\/(.*)$", "\1" ~ "://" ~ cloudera_archive_authn ~ "@\2") }}
     dest: >-
-      {{ local_temp_dir }}/{{ repo_tarball_staging_local_dir }}/
-      {{ __parcel_download_item.0.name | regex_replace("^(.*)\/(.*?)\/([0-9\.]+)(.*)$", "\2-\3-parcels") }}/
-      {{ __parcel_download_item.0.name | regex_replace("^(.*?)\/p\/(.*)\/$", "\2") }}/{{ __parcel_download_item.1 }}
+      {{ local_temp_dir }}/{{ repo_tarball_staging_local_dir }}/{{ __parcel_download_item.0.name | regex_replace("^(.*)\/(.*?)\/([0-9\.]+)(.*)$", "\2-\3-parcels") }}/{{ __parcel_download_item.0.name | regex_replace("^(.*?)\/p\/(.*)\/$", "\2") }}/{{ __parcel_download_item.1 }}
 
 - name: Track async downloads to completion  [ This may take a while if your files are very large or far away ]
   loop: "{{ __download_parcels_results.results }}"
