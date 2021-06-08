@@ -14,7 +14,7 @@
 
 ---
 
-local_temp_dir: /tmp
+local_temp_dir: "{{ rehost_local_temp_dir | default('/tmp') }}"
 repo_tarball_staging_local_dir: repo
 
 preload_parcels:

@@ -14,9 +14,11 @@
 
 ---
 
-local_temp_dir: /tmp
-repo_tar_local_dir: repo
-repo_tar_files: "{{ definition.repo_tar_files | default([]) }}"
+local_temp_dir: "{{ rehost_local_temp_dir | default('/tmp') }}"
+repo_tar_local_dir: "{{ repo_tarball_staging_local_dir | default('repo') }}"
+# TODO: maybe automate repo tar files enlisting (output from tarball_parcels role)
+repo_tar_files: 
+  - cdh6-6.3.2-parcels.tar.gz
 keep_newer: yes
 
 custom_repo_rehost_files: "{{ [scm_repo_tarball_url] }}"
