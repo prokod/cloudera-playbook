@@ -52,7 +52,7 @@
 - name: Ensure staged Parcel Repo directories are present
   ansible.builtin.file:
     path: >-
-       {{ local_temp_dir }}/{{ repo_tarball_staging_local_dir }}/{{ __parcel_repo_item | regex_replace("^(.*)\/(.*?)\/([0-9\.]+)(.*)$", "\2-\3-parcels") }}/{{ __parcel_download_item.0.name | regex_replace("^(.*?)\/p\/(.*)\/$", "\2") }}
+       {{ local_temp_dir }}/{{ repo_tarball_staging_local_dir }}/{{ __parcel_repo_item | regex_replace("^(.*)\/(.*?)\/([0-9\.]+)(.*)$", "\2-\3-parcels") }}/{{ __parcel_repo_item | regex_replace("^(.*?)\/p\/(.*)\/$", "\2") }}
     state: directory
   loop: "{{ parcel_repos_keys }}"
   loop_control:
@@ -90,7 +90,7 @@
 - name: Create Parcel Repo tarballs
   archive:
     path: >-
-      {{ local_temp_dir }}/{{ repo_tarball_staging_local_dir }}/{{ __parcel_repo_item | regex_replace("^(.*)\/(.*?)\/([0-9\.]+)(.*)$", "\2-\3-parcels") }}/{{ __parcel_download_item.0.name | regex_replace("^(.*?)\/p\/(.*)\/$", "\2") }}
+      {{ local_temp_dir }}/{{ repo_tarball_staging_local_dir }}/{{ __parcel_repo_item | regex_replace("^(.*)\/(.*?)\/([0-9\.]+)(.*)$", "\2-\3-parcels") }}/{{ __parcel_repo_item | regex_replace("^(.*?)\/p\/(.*)\/$", "\2") }}
     dest: >-
       {{ local_temp_dir }}/{{ repo_tarball_staging_local_dir }}/{{ __parcel_repo_item | regex_replace("^(.*)\/(.*?)\/([0-9\.]+)(.*)$", "\2-\3-parcels") }}.tar.gz
   loop: "{{ parcel_repos_keys }}"
