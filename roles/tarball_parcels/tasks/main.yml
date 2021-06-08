@@ -71,9 +71,11 @@
   poll: 0
   ansible.builtin.get_url:
     url: >-
-      {{ (__parcel_download_item.0.name ~ __parcel_download_item.1) | regex_replace("^(.*?)\:\/\/(.*)$", "\1" ~ "://" ~ cloudera_archive_authn ~ "@\2") }}
+      {{ (__parcel_download_item.0.name ~ __parcel_download_item.1) | regex_replace("^(.*?)\://(.*)$", "\1" ~ "://" ~ cloudera_archive_authn ~ "@\2") }}
     dest: >-
-      {{ local_temp_dir }}/{{ repo_tarball_staging_local_dir }}/{{ __parcel_download_item.0.name | regex_replace("^(.*)\/(.*?)\/([0-9\.]+)(.*)$", "\2-\3-parcels") }}/{{ __parcel_download_item.0.name | regex_replace("^(.*?)\/p\/(.*)\/$", "\2") }}/{{ __parcel_download_item.1 }}
+      {{ local_temp_dir }}/{{ repo_tarball_staging_local_dir
+      }}/{{ __parcel_download_item.0.name | urlsplit('path') | regex_replace("^/p/(.*?)/([0-9\.]+).*$", "\1-\2-parcels") | regex_replace("^/p/(.*?)/.*$", "\1-parcels")
+      }}/{{ __parcel_download_item.0.name | urlsplit('path') | regex_replace("^/p/(.*)/$", "\1") }}/{{ __parcel_download_item.1 }}
 
 - name: Track async downloads to completion  [ This may take a while if your files are very large or far away ]
   loop: "{{ __download_parcels_results.results }}"
@@ -92,9 +94,12 @@
 - name: Create Parcel Repo tarballs
   archive:
     path: >-
-      {{ local_temp_dir }}/{{ repo_tarball_staging_local_dir }}/{{ __parcel_repo_item | regex_replace("^(.*)\/(.*?)\/([0-9\.]+)(.*)$", "\2-\3-parcels") }}/{{ __parcel_repo_item | regex_replace("^(.*?)\/p\/(.*)\/$", "\2") }}
+      {{ local_temp_dir }}/{{ repo_tarball_staging_local_dir
+      }}/{{ __parcel_repo_item | urlsplit('path') | regex_replace("^/p/(.*?)/([0-9\.]+).*$", "\1-\2-parcels") | regex_replace("^/p/(.*?)/.*$", "\1-parcels")
+      }}/{{ __parcel_repo_item | urlsplit('path') | regex_replace("^/p/(.*)/$", "\1") }}
     dest: >-
-      {{ local_temp_dir }}/{{ repo_tarball_staging_local_dir }}/{{ __parcel_repo_item | regex_replace("^(.*)\/(.*?)\/([0-9\.]+)(.*)$", "\2-\3-parcels") }}.tar.gz
+      {{ local_temp_dir }}/{{ repo_tarball_staging_local_dir
+      }}/{{ __parcel_repo_item | urlsplit('path') | regex_replace("^/p/(.*?)/([0-9\.]+).*$", "\1-\2-parcels") | regex_replace("^/p/(.*?)/.*$", "\1-parcels") }}.tar.gz
   loop: "{{ parcel_repos_keys }}"
   loop_control:
     loop_var: __parcel_repo_item
