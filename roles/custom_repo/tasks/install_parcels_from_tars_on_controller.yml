@@ -24,7 +24,7 @@
 - name: Upload and extract parcel tar file
   ansible.builtin.unarchive:
     # example: repo/cdh-6.3.2-parcels.tar.gz
-    src: "{{ repo_tar_local_dir }}/{{ repo_tar_file }}"
+    src: "{{local_temp_dir}}/{{ repo_tar_local_dir }}/{{ repo_tar_file }}"
     # example: /tmp
     dest: "{{ local_temp_dir }}"
     keep_newer: "{{ keep_newer }}"
