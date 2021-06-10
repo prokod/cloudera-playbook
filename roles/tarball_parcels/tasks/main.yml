@@ -95,8 +95,7 @@
   archive:
     path: >-
       {{ local_temp_dir }}/{{ repo_tarball_staging_local_dir
-      }}/{{ __parcel_repo_item | urlsplit('path') | regex_replace("^/p/(.*?)/([0-9\.]+).*$", "\1-\2-parcels") | regex_replace("^/p/(.*?)/.*$", "\1-parcels")
-      }}/{{ __parcel_repo_item | urlsplit('path') | regex_replace("^/p/(.*)/$", "\1") }}
+      }}/{{ __parcel_repo_item | urlsplit('path') | regex_replace("^/p/(.*?)/([0-9\.]+).*$", "\1-\2-parcels") | regex_replace("^/p/(.*?)/.*$", "\1-parcels") }}
     dest: >-
       {{ local_temp_dir }}/{{ repo_tarball_staging_local_dir
       }}/{{ __parcel_repo_item | urlsplit('path') | regex_replace("^/p/(.*?)/([0-9\.]+).*$", "\1-\2-parcels") | regex_replace("^/p/(.*?)/.*$", "\1-parcels") }}.tar.gz
