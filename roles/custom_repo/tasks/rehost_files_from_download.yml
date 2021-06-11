@@ -70,8 +70,14 @@
   when: custom_repo_rehost_files | select('search', 'tar.gz') | list | select('search', '/cm') | list | length > 0
   vars:
     cloudera_archive_base_url:          "http://{{ groups['custom_repo'] | first }}"
+    filter_url_path_p_prefix:           "map('regex_replace', '^/p(.*)$', '\\1'))"
+    filter_url_path_version_patch:      "map('regex_replace', '^(.*)([0-9\\.]+)-.*?(/.*)$', '\\1\\2\\3'))"
   ansible.builtin.set_fact:
-    scm_parcel_repositories:            "{{ [cloudera_archive_base_url] | product(scm_parcel_repositories | map('urlsplit', 'path') | map('regex_replace', '^/p(.*)$', '\\1')) | map('join') | list }}"
+    scm_parcel_repositories: >-
+                                        {{ [cloudera_archive_base_url] | product(scm_parcel_repositories | map('urlsplit', 'path')
+                                          | filter_url_path_p_prefix
+                                          | filter_url_path_version_patch
+                                          | map('join') | list }}
     scm_repo_url:                       "{{ cloudera_archive_base_url }}{{ scm_repo_url | urlsplit('path') }}"
     scm_repo_gpgkey:                    "{{ cloudera_archive_base_url }}{{ scm_repo_gpgkey | urlsplit('path') }}"
   delegate_to: "{{ __play_host }}"
