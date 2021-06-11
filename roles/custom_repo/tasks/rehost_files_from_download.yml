@@ -66,6 +66,12 @@
     dest: "/var/www/html{{ __tmp_unpack_item | urlsplit('path') | regex_replace('^(.+)repo.+-(.+)\\.tar\\.gz$', '\\1\\2' + '/yum/') }}"
     keep_newer: "{{ keep_newer }}"
 
+# scm_parcel_repositories is overriden with the following logic:
+# - filter_url_path_p_prefix: map('regex_replace', '^/p(.*)$', '\\1'))
+#   Which removes root path dir '/p'
+# - filter_url_path_version_patch: map('regex_replace', '^(.*)([0-9\\.]+)-.*?(/.*)$', '\\1\\2\\3'))
+#   Which modifies full version path dir to base one with no patch version suffix in it.
+#   For example '/6.3.2-patch4072/' -> '/6.3.2/'
 - name: Set Cloudera Manager Base Repo if included in rehosting list
   when: custom_repo_rehost_files | select('search', 'tar.gz') | list | select('search', '/cm') | list | length > 0
   vars:
@@ -73,9 +79,7 @@
   ansible.builtin.set_fact:
     scm_parcel_repositories: >-
                                         {{ [cloudera_archive_base_url] | product(scm_parcel_repositories | map('urlsplit', 'path')
-                                        {% filter_url_path_p_prefix %}
                                           | map('regex_replace', '^/p(.*)$', '\\1'))
-                                        {% filter_url_path_version_patch %}
                                           | map('regex_replace', '^(.*)([0-9\\.]+)-.*?(/.*)$', '\\1\\2\\3'))
                                           | map('join') | list }}
     scm_repo_url:                       "{{ cloudera_archive_base_url }}{{ scm_repo_url | urlsplit('path') }}"
