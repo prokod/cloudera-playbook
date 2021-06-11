@@ -79,8 +79,8 @@
   ansible.builtin.set_fact:
     scm_parcel_repositories: >-
                                         {{ [cloudera_archive_base_url] | product(scm_parcel_repositories | map('urlsplit', 'path')
-                                          | map('regex_replace', '^/p(.*)$', '\\1'))
-                                          | map('regex_replace', '^(.*)([0-9\\.]+)-.*?(/.*)$', '\\1\\2\\3'))
+                                          | map('regex_replace', '^/p(.*)$', '\\1')
+                                          | map('regex_replace', '^(.*)([0-9\\.]+)-[^/]*(/.*)$', '\\1\\2\\3'))
                                           | map('join') | list }}
     scm_repo_url:                       "{{ cloudera_archive_base_url }}{{ scm_repo_url | urlsplit('path') }}"
     scm_repo_gpgkey:                    "{{ cloudera_archive_base_url }}{{ scm_repo_gpgkey | urlsplit('path') }}"
