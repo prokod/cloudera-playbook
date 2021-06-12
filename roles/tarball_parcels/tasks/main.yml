@@ -51,7 +51,7 @@
 - name: Assert valid repos
   assert:
     that:
-      - parcel_repos_files | map(attribute='files') | map('length') | reject('equalto', 0) | length != parcel_repos_files | length
+      - parcel_repos_files | map(attribute='files') | map('length') | reject('equalto', 0) | length == parcel_repos_files | length
     fail_msg: "Detected empty repo! Possible fix: remove offending repo from 'scm_parcel_repositories'"
     quiet: true
 
