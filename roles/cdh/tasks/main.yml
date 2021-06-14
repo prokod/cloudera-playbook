@@ -1,9 +1,20 @@
 ---
 
-- set_fact:
-    dynamic_errors: "{{ lookup('template', 'dynamic.j2') }}"
+- name: Prepare dynamic clusterdef layer
+  set_fact:
+    dynamic_output: "{{ lookup('template', 'dynamic.j2') }}"
 
-- debug: var=dynamic_errors
+- name: Assert no errors present on dynamic layer output
+  assert:
+    that:
+      - dynamic_output.errors | dict2items | length == 0
+    fail_msg: "{{ dynamic_output.errors | to_json }}"
+    quiet: true
+  
+# Dynamic insights override if needed cdh_servers services' settings
+- name: Overlay clusterdef with dynamic insights
+  set_fact:
+    clusterdef: "{{ dynamic_output.clusterdef }}"
 
 - include_vars: ../../../group_vars/cdh_servers.yml
 - include_vars: ../../../group_vars/db_server.yml
