@@ -6,6 +6,7 @@
 {% endif %}
 {% for host in groups['cdh_servers'] %}
 {%   if 'host_template' in hostvars[host] %}
+{%     set _ = errors.update({"{{ hostvars[host].ansible_host }}": "{{ hostvars[host]['host_template'] }}"}) %}
 {%     if hostvars[host]['host_template'] == 'HostTemplate-Single-Master' %}
 {%       if clusterdef.dynamic['autofailover_enabled'] is defined and clusterdef.dynamic['autofailover_enabled'] %}
 {%         set _ = errors.update({'autofailover_enabled': 'Illegal state: Both HostTemplate-Single-Master and HostTemplate-Master[1-3] templates are defined in inventory'}) %}
