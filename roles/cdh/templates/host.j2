@@ -7,6 +7,7 @@
     "HDFS-1-HTTPFS-BASE",
     "HIVE-1-HIVEMETASTORE-BASE",
     "HIVE-1-HIVESERVER2-BASE",
+    "SENTRY-1-SENTRY_SERVER-BASE",
     "IMPALA-1-CATALOGSERVER-BASE",
     "IMPALA-1-STATESTORE-BASE",
     "HUE-1-HUE_SERVER-BASE",
@@ -51,6 +52,8 @@
   "roleConfigGroupsRefNames": [
     "HBASE-1-MASTER-BASE",
     "HDFS-1-NAMENODE-BASE",
+    "IMPALA-1-CATALOGSERVER-BASE",
+    "IMPALA-1-STATESTORE-BASE",
     "YARN-1-RESOURCEMANAGER-BASE",
     "YARN-1-JOBHISTORY-BASE",
     "ZOOKEEPER-1-SERVER-BASE",
@@ -109,4 +112,68 @@
     {% endif %}
     "YARN-1-NODEMANAGER-BASE",
     "KUDU-1-KUDU_TSERVER-BASE" ]
+}, {
+  "refName": "HostTemplate-Worker1",
+  "cardinality": 1,
+  "roleConfigGroupsRefNames": [
+    "HBASE-1-REGIONSERVER-BASE",
+    "HDFS-1-DATANODE-BASE",
+    "HIVE-1-GATEWAY-BASE",
+    "IMPALA-1-IMPALAD-BASE",
+    "SPARK_ON_YARN-1-GATEWAY-BASE",
+    {% if cluster_version_cdh_major < '6' %}
+    "SPARK2_ON_YARN-1-GATEWAY-BASE",
+    {% endif %}
+    "YARN-1-NODEMANAGER-BASE",
+    "YARN-1-GATEWAY-BASE",
+    "KUDU-1-KUDU_TSERVER-BASE",
+    "HIVE-1-HIVEMETASTORE-BASE",
+    "HIVE-1-HIVESERVER2-BASE",
+    "SENTRY-1-SENTRY_SERVER-BASE",
+    "OOZIE-1-OOZIE_SERVER-BASE",
+    "HBASE-1-HBASERESTSERVER-BASE",
+    "HBASE-1-HBASETHRIFTSERVER-BASE" ]
+}, {
+  "refName": "HostTemplate-Worker2",
+  "cardinality": 1,
+  "roleConfigGroupsRefNames": [
+    "HBASE-1-REGIONSERVER-BASE",
+    "HDFS-1-DATANODE-BASE",
+    "HIVE-1-GATEWAY-BASE",
+    "IMPALA-1-IMPALAD-BASE",
+    "SPARK_ON_YARN-1-GATEWAY-BASE",
+    {% if cluster_version_cdh_major < '6' %}
+    "SPARK2_ON_YARN-1-GATEWAY-BASE",
+    {% endif %}
+    "YARN-1-NODEMANAGER-BASE",
+    "YARN-1-GATEWAY-BASE",
+    "KUDU-1-KUDU_TSERVER-BASE",
+    "HIVE-1-HIVEMETASTORE-BASE",
+    "HIVE-1-HIVESERVER2-BASE",
+    "SENTRY-1-SENTRY_SERVER-BASE",
+    "HDFS-1-GATEWAY-BASE",
+    "HBASE-1-HBASERESTSERVER-BASE",
+    "HBASE-1-HBASETHRIFTSERVER-BASE" ]
+}, {
+  "refName": "HostTemplate-Worker3",
+  "cardinality": 1,
+  "roleConfigGroupsRefNames": [
+    "HBASE-1-REGIONSERVER-BASE",
+    "HDFS-1-DATANODE-BASE",
+    "HIVE-1-GATEWAY-BASE",
+    "IMPALA-1-IMPALAD-BASE",
+    "SPARK_ON_YARN-1-GATEWAY-BASE",
+    {% if cluster_version_cdh_major < '6' %}
+    "SPARK2_ON_YARN-1-GATEWAY-BASE",
+    {% endif %}
+    "YARN-1-NODEMANAGER-BASE",
+    "YARN-1-GATEWAY-BASE",
+    "KUDU-1-KUDU_TSERVER-BASE",
+    "HDFS-1-HTTPFS-BASE",
+    "HDFS-1-SECONDARYNAMENODE-BASE",
+    "HUE-1-HUE_SERVER-BASE",
+    "HUE-1-HUE_LOAD_BALANCER-BASE",
+    {% if (krb5_kdc_type is defined) and (krb5_kdc_type != 'none') %}
+    "HUE-1-KT_RENEWER-BASE",
+    {% endif %} ]
 } ]
