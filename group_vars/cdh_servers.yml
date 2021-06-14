@@ -14,6 +14,7 @@ cdh_services:
     fs_checkpoint_dir_list: /dfs/snn
     dfs_name_dir_list: /dfs/nn
     dfs_journalnode_edits_dir: /dfs/jn
+    autofailover_enabled: "{{ clusterdef.dynamic.autofailover_enabled | default(clusterdef[cluster_display_name].autofailover_enabled) }}"
 
   - type: kudu
     m_fs_data_dirs: "/var/lib/kudu/master"

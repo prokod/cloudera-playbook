@@ -1,0 +1,4 @@
+
+clusterdef:
+  cluster_1:
+    autofailover_enabled: false

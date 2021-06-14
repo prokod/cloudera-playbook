@@ -1,5 +1,10 @@
 ---
 
+- set_fact:
+    dynamic_errors: "{{ lookup('template', 'dynamic.j2') }}"
+
+- debug: var=dynamic_errors
+
 - include_vars: ../../../group_vars/cdh_servers.yml
 - include_vars: ../../../group_vars/db_server.yml
 

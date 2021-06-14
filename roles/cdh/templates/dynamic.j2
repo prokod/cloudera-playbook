@@ -1,0 +1,22 @@
+{% set errors = {} %}
+{% if clusterdef is defined %}
+{%   set _ = clusterdef.update({'dynamic': {}}) %}
+{% else %}
+{%   set clusterdef = {'dynamic': {}} %}
+{% endif %}
+{% for host in groups['cdh_servers'] %}
+{%   if 'host_template' in hostvars[host] %}
+{%     if hostvars[host]['host_template'] == 'HostTemplate-Single-Master' %}
+{%       if clusterdef.dynamic['autofailover_enabled'] is defined and clusterdef.dynamic['autofailover_enabled'] %}
+{%         set _ = errors.update({'autofailover_enabled': 'Illegal state: Both HostTemplate-Single-Master and HostTemplate-Master[1-3] templates are defined in inventory'}) %}
+{%       endif %}
+{%       set _ = clusterdef.dynamic.update({'autofailover_enabled': false}) %}
+{%     elif hostvars[host]['host_template'] | regex_search('HostTemplate-Master[1-3]' %}
+{%       if clusterdef.dynamic['autofailover_enabled'] is defined and not clusterdef.dynamic['autofailover_enabled'] %}
+{%         set _ = errors.update({'autofailover_enabled': 'Illegal state: Both HostTemplate-Single-Master and HostTemplate-Master[1-3] templates are defined in inventory'}) %}
+{%       endif %}
+{%       set _ = clusterdef.dynamic.update({'autofailover_enabled': true}) %}
+{%     endif %}
+{%   endif %}
+{% endfor %}
+{{ errors | to_json }}
