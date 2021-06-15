@@ -25,14 +25,11 @@
         host_templates: "{{ lookup('template', 'host.j2') }}"
     - debug: var=host_templates
     - set_fact:
-        host_templates_rquested: "{{ groups['cdh_servers'] | map('extract', hostvars) | selectattr('host_template', 'defined') | map(attribute, 'host_template') | unique | list }}"
+        host_templates_rquested: "{{ groups['cdh_servers'] | map('extract', hostvars) | selectattr('host_template', 'defined') | map(attribute='host_template') | unique | list }}"
     - debug: var=host_templates_rquested
     - set_fact:
-        rcg_ref_names_requested: "{{ host_templates_rquested | map('extract', dict(host_templates | map(attribute, 'refName') zip(host_templates)), 'roleConfigGroupsRefNames') | flatten | unique | list }}"
+        rcg_ref_names_requested: "{{ host_templates_rquested | map('extract', dict((host_templates | map(attribute='refName')) | zip(host_templates)), 'roleConfigGroupsRefNames') | flatten | unique | list }}"
     - debug: var=rcg_ref_names_requested
-    - set_fact:
-        cdh_services_as_dict: "{{ dict(cdh_services | map(attributes, 'type') | zip(cdh_services)) }}"
-    - debug: var=cdh_services_as_dict
     - set_fact:
         updated_cdh_services: "{{ updated_cdh_services | default([]) | union(item) }}"
       when: regex_findall(rcg_ref_names_requested, item.type) | length > 0
