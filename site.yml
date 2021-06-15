@@ -1,5 +1,32 @@
 ---
 # Cloudera playbook
+- name: Generate parcels archives to be used by install parcels tasks
+  hosts: localhost
+  connection: local
+  become: yes
+  roles:
+    - tarball_parcels
+  tags:
+    - tarball_parcels
+    - custom_repo
+
+- name: Install custom parcel repository
+  hosts: custom_repo
+  become: yes
+  roles:
+    - custom_repo
+  tags:
+    - custom_repo
+
+- name: Preload parcels from custom repo to Cloudera Manager
+  hosts: scm_server
+  become: yes
+  gather_facts: no
+  roles:
+    - role: preload_parcels
+      when: "'custom_repo' in groups"
+  tags:
+    - preload_parcels
 
 - name: Configure Cloudera Manager Repository
   hosts: cdh_servers

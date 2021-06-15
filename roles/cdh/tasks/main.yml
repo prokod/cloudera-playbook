@@ -1,7 +1,42 @@
 ---
 
+- name: Prepare dynamic clusterdef layer
+  set_fact:
+    dynamic_output: "{{ lookup('template', 'dynamic.j2') }}"
+
+- name: Assert no errors present on dynamic layer output
+  assert:
+    that:
+      - dynamic_output.errors | dict2items | length == 0
+    fail_msg: "{{ dynamic_output.errors | to_json }}"
+    quiet: true
+  
+# Dynamic insights override if needed cdh_servers services' settings
+- name: Overlay clusterdef with dynamic insights
+  set_fact:
+    clusterdef: "{{ dynamic_output.clusterdef }}"
+
 - include_vars: ../../../group_vars/cdh_servers.yml
 - include_vars: ../../../group_vars/db_server.yml
+
+# This block overrides the services as enumerated under cdh_services
+# Basically the each service type is searched for as a pattern in the list of to be used rcg_ref_names
+# As assembeled from inventory file (host_template) and host.j2
+- name: Dynamic overlay of CDH servers services
+  block:
+    - set_fact:
+        host_templates: "{{ lookup('template', 'host.j2') }}"
+    - set_fact:
+        host_templates_rquested: "{{ groups['cdh_servers'] | map('extract', hostvars) | selectattr('host_template', 'defined') | map(attribute='host_template') | unique | list }}"
+    - set_fact:
+        rcg_ref_names_requested: "{{ host_templates_rquested | map('extract', dict((host_templates | map(attribute='refName')) | zip(host_templates)), 'roleConfigGroupsRefNames') | flatten | unique | list }}"
+    - set_fact:
+        updated_cdh_services: "{{ (updated_cdh_services | default([])) | union([item]) }}"
+      when: rcg_ref_names_requested | regex_findall("(?i)" ~ item.type) | length > 0
+      loop: "{{ cdh_services }}"
+    - set_fact:
+        cdh_services: "{{ updated_cdh_services }}"
+  when: dynamic_cdh_services_enabled
 
 # Check whether cluster already exists
 # https://cloudera.github.io/cm_api/apidocs/v13/path__clusters.html

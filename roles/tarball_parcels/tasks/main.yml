@@ -1,0 +1,111 @@
+- setup:
+
+- name: Get Parcel repositories content
+  uri:
+    url: "{{ __parcel_repository_item }}"
+    return_content: yes
+  register: parcel_repositories
+  loop: "{{ scm_parcel_repositories }}"
+  loop_control:
+    loop_var: __parcel_repository_item
+
+- name: Regex pattern for filtering parcel distro repo manifest (case 1)
+  set_fact: pattern1="{{ '(?:.*?cdh' ~ cluster_version_cdh_version ~ '.*?\n)+(?:.*?\n)*.*?href\=\"(manifest.json)\"' }}"
+
+- name: Regex pattern for filtering parcel distro repo manifest (case 2)
+  set_fact: pattern2="{{ '(?:.*?\n)*.*?href\=\"(manifest.json)\".*?\n(?:.*?\n)*(?:.*?cdh' ~ cluster_version_cdh_version ~ '.*?\n)+' }}"
+
+- name: Regex pattern for filtering parcel distro parcels
+  set_fact: pattern3="{{ 'href\=\"((?:.*?cdh' ~ cluster_version_cdh_version ~ '.*?' ~ parcel_distro ~ ')\.?(?:sha|sha1|sha256)?)\"' }}"
+
+- name: Extract repo keys (url as key)
+  set_fact: parcel_repos_keys="{{ parcel_repositories.results | map(attribute='url') | list }}"
+
+# Dictionary example:
+# {
+#    "parcel_repos_files":[
+#       {
+#          "files":[
+#             "manifest.json",
+#             "CDH-6.3.2-1.cdh6.3.2.p4071.7339474-el7.parcel",
+#             "CDH-6.3.2-1.cdh6.3.2.p4071.7339474-el7.parcel.sha1",
+#             "CDH-6.3.2-1.cdh6.3.2.p4071.7339474-el7.parcel.sha256"
+#          ],
+#          "name":"https://archive.cloudera.com/p/cdh6/6.3.2-patch4071/parcels/"
+#       },
+#       {
+#          "files":[            
+#          ],
+#          "name":"https://archive.cloudera.com/p/spark2/parcels/latest/"
+#       }
+#    ]
+# }
+- name: Compose repos files dictionary
+  set_fact:
+    parcel_repos_files: >-
+       {{ (dict(parcel_repos_keys | zip(parcel_repositories.results | map(attribute='content') | map('regex_findall', pattern1 | string ) | list))
+         | combine(dict(parcel_repos_keys | zip(parcel_repositories.results | map(attribute='content') | map('regex_findall', pattern2 | string ) | list)), list_merge='append_rp'))
+         | combine(dict(parcel_repos_keys | zip(parcel_repositories.results | map(attribute='content') | map('regex_findall', pattern3 | string ) | list)), list_merge='append_rp') 
+         | dict2items(key_name='name', value_name='files') }}
+
+- name: Assert valid repos
+  assert:
+    that:
+      - parcel_repos_files | map(attribute='files') | map('length') | reject('equalto', 0) | length == parcel_repos_files | length
+    fail_msg: "Detected empty repo! Possible fix: remove offending repo from 'scm_parcel_repositories'"
+    quiet: true
+
+# Example of dest dir: "{{ local_temp_dir }}/{{ repo_tarball_staging_local_dir }}/cdh6-6.3.2-parcels/cdh6/6.3.2-patch4071/parcels
+- name: Ensure staged Parcel Repo directories are present
+  ansible.builtin.file:
+    path: >-
+       {{ local_temp_dir }}/{{ repo_tarball_staging_local_dir
+       }}/{{ __parcel_repo_item | urlsplit('path') | regex_replace("^/p/(.*?)/([0-9\.]+).*$", "\1-\2-parcels") | regex_replace("^/p/(.*?)/.*$", "\1-parcels")
+       }}/{{ __parcel_repo_item | urlsplit('path') | regex_replace("^/p/(.*)/$", "\1") }}
+    state: directory
+  loop: "{{ parcel_repos_keys }}"
+  loop_control:
+    loop_var: __parcel_repo_item
+
+# Example of item.0.name: "https://archive.cloudera.com/p/cdh6/6.3.2-patch4071/parcels/"
+# Example of dest dir: "{{ local_temp_dir }}/{{ repo_tarball_staging_local_dir }}/cdh6-6.3.2-parcels/cdh6/6.3.2-patch4071/parcels
+- name: Request Async Download of Parcels to tarball/s staging dir/s
+  register: __download_parcels_results
+  loop: "{{ parcel_repos_files | subelements('files') }}"
+  loop_control:
+    loop_var: __parcel_download_item
+  async: 3600
+  poll: 0
+  ansible.builtin.get_url:
+    url: >-
+      {{ (__parcel_download_item.0.name ~ __parcel_download_item.1) | regex_replace("^(.*?)\://(.*)$", "\1" ~ "://" ~ cloudera_archive_authn ~ "@\2") }}
+    dest: >-
+      {{ local_temp_dir }}/{{ repo_tarball_staging_local_dir
+      }}/{{ __parcel_download_item.0.name | urlsplit('path') | regex_replace("^/p/(.*?)/([0-9\.]+).*$", "\1-\2-parcels") | regex_replace("^/p/(.*?)/.*$", "\1-parcels")
+      }}/{{ __parcel_download_item.0.name | urlsplit('path') | regex_replace("^/p/(.*)/$", "\1") }}/{{ __parcel_download_item.1 }}
+
+- name: Track async downloads to completion  [ This may take a while if your files are very large or far away ]
+  loop: "{{ __download_parcels_results.results }}"
+  loop_control:
+    loop_var: __download_async_item
+  register: __async_download_results
+  until: __async_download_results.finished is defined and __async_download_results.finished
+  delay: 15
+  retries: 300
+  async_status:
+    jid: "{{ __download_async_item.ansible_job_id }}"
+  failed_when:
+    - __download_async_item.failed == True
+    - __download_async_item.finished != 1
+
+- name: Create Parcel Repo tarballs
+  archive:
+    path: >-
+      {{ local_temp_dir }}/{{ repo_tarball_staging_local_dir
+      }}/{{ __parcel_repo_item | urlsplit('path') | regex_replace("^/p/(.*?)/([0-9\.]+).*$", "\1-\2-parcels") | regex_replace("^/p/(.*?)/.*$", "\1-parcels") }}
+    dest: >-
+      {{ local_temp_dir }}/{{ repo_tarball_staging_local_dir
+      }}/{{ __parcel_repo_item | urlsplit('path') | regex_replace("^/p/(.*?)/([0-9\.]+).*$", "\1-\2-parcels") | regex_replace("^/p/(.*?)/.*$", "\1-parcels") }}.tar.gz
+  loop: "{{ parcel_repos_keys }}"
+  loop_control:
+    loop_var: __parcel_repo_item

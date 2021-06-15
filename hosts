@@ -1,6 +1,9 @@
 [scm_server]
 <host>
 
+[custom_repo]
+<host>
+
 [db_server]
 <host>
 
