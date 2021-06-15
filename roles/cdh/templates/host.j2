@@ -50,6 +50,7 @@
   "cardinality": 1,
   "roleConfigGroupsRefNames": [
     "HBASE-1-MASTER-BASE",
+    "HDFS-1-BALANCER-BASE",
     "HDFS-1-NAMENODE-BASE",
     "HDFS-1-SECONDARYNAMENODE-BASE",
     "IMPALA-1-CATALOGSERVER-BASE",
@@ -58,7 +59,8 @@
     "YARN-1-JOBHISTORY-BASE",
     "ZOOKEEPER-1-SERVER-BASE",
     "KUDU-1-KUDU_MASTER-BASE",
-    "SPARK_ON_YARN-1-SPARK_YARN_HISTORY_SERVER-BASE"]
+    "SPARK_ON_YARN-1-SPARK_YARN_HISTORY_SERVER-BASE",
+    "YARN-1-GATEWAY-BASE" ]
 }, {
   "refName": "HostTemplate-Master1",
   "cardinality": 1,
@@ -125,7 +127,6 @@
     "SPARK2_ON_YARN-1-GATEWAY-BASE",
     {% endif %}
     "YARN-1-NODEMANAGER-BASE",
-    "YARN-1-GATEWAY-BASE",
     "KUDU-1-KUDU_TSERVER-BASE",
     "HIVE-1-HIVEMETASTORE-BASE",
     "HIVE-1-HIVESERVER2-BASE",
@@ -146,7 +147,6 @@
     "SPARK2_ON_YARN-1-GATEWAY-BASE",
     {% endif %}
     "YARN-1-NODEMANAGER-BASE",
-    "YARN-1-GATEWAY-BASE",
     "KUDU-1-KUDU_TSERVER-BASE",
     "HIVE-1-HIVEMETASTORE-BASE",
     "HIVE-1-HIVESERVER2-BASE",
@@ -167,7 +167,6 @@
     "SPARK2_ON_YARN-1-GATEWAY-BASE",
     {% endif %}
     "YARN-1-NODEMANAGER-BASE",
-    "YARN-1-GATEWAY-BASE",
     "KUDU-1-KUDU_TSERVER-BASE",
     "HDFS-1-HTTPFS-BASE",
     "HDFS-1-SECONDARYNAMENODE-BASE",
@@ -176,4 +175,4 @@
     {% if (krb5_kdc_type is defined) and (krb5_kdc_type != 'none') %}
     "HUE-1-KT_RENEWER-BASE",
     {% endif %} ]
-} ]
+    } ]
