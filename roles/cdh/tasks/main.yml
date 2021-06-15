@@ -30,12 +30,8 @@
     - set_fact:
         rcg_ref_names_requested: "{{ host_templates_rquested | map('extract', dict((host_templates | map(attribute='refName')) | zip(host_templates)), 'roleConfigGroupsRefNames') | flatten | unique | list }}"
     - debug: var=rcg_ref_names_requested
-    - debug:
-        msg: "{{ item }}"
-      when: rcg_ref_names_requested | regex_findall("(?i)" ~ item.type) | length > 0
-      loop: "{{ cdh_services }}"
     - set_fact:
-        updated_cdh_services: "{{ updated_cdh_services | default([]) | union(item) }}"
+        updated_cdh_services: "{{ updated_cdh_services | default([]) | union({item}) }}"
       when: rcg_ref_names_requested | regex_findall("(?i)" ~ item.type) | length > 0
       loop: "{{ cdh_services }}"
     - debug: var=updated_cdh_services
