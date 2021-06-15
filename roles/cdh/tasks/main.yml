@@ -19,6 +19,9 @@
 - include_vars: ../../../group_vars/cdh_servers.yml
 - include_vars: ../../../group_vars/db_server.yml
 
+# This block overrides the services as enumerated under cdh_services
+# Basically the each service type is searched for as a pattern in the list of to be used rcg_ref_names
+# As assembeled from inventory file (host_template) and host.j2
 - name: Dynamic overlay of CDH servers services
   block:
     - set_fact:
@@ -33,8 +36,7 @@
       loop: "{{ cdh_services }}"
     - set_fact:
         cdh_services: "{{ updated_cdh_services }}"
-
-- debug: var=cdh_services
+  when: dynamic_cdh_services_enabled
 
 # Check whether cluster already exists
 # https://cloudera.github.io/cm_api/apidocs/v13/path__clusters.html
