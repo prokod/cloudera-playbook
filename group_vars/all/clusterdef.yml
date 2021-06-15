@@ -6,11 +6,11 @@ clusterdef:
       fs_checkpoint_dir_list: /dfs/snn
       dfs_name_dir_list: /dfs/nn
       dfs_journalnode_edits_dir: /dfs/jn
-      autofailover_enabled: false
+      autofailover_enabled: "false"
   cluster_poc:
     hdfs:
       dfs_data_dir_list: /data/dfs/dn
       fs_checkpoint_dir_list: /data/dfs/snn
       dfs_name_dir_list: /data/dfs/nn
       dfs_journalnode_edits_dir: /data/dfs/jn
-      autofailover_enabled: false
+      autofailover_enabled: "false"
