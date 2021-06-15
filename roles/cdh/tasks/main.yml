@@ -23,20 +23,18 @@
   block:
     - set_fact:
         host_templates: "{{ lookup('template', 'host.j2') }}"
-    - debug: var=host_templates
     - set_fact:
         host_templates_rquested: "{{ groups['cdh_servers'] | map('extract', hostvars) | selectattr('host_template', 'defined') | map(attribute='host_template') | unique | list }}"
-    - debug: var=host_templates_rquested
     - set_fact:
         rcg_ref_names_requested: "{{ host_templates_rquested | map('extract', dict((host_templates | map(attribute='refName')) | zip(host_templates)), 'roleConfigGroupsRefNames') | flatten | unique | list }}"
-    - debug: var=rcg_ref_names_requested
     - set_fact:
         updated_cdh_services: "{{ (updated_cdh_services | default([])) | union([item]) }}"
       when: rcg_ref_names_requested | regex_findall("(?i)" ~ item.type) | length > 0
       loop: "{{ cdh_services }}"
-    - debug: var=updated_cdh_services
     - set_fact:
         cdh_services: "{{ updated_cdh_services }}"
+
+- debug: var=cdh_services
 
 # Check whether cluster already exists
 # https://cloudera.github.io/cm_api/apidocs/v13/path__clusters.html
