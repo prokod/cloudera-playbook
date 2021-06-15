@@ -32,7 +32,7 @@
     - debug: var=rcg_ref_names_requested
     - set_fact:
         updated_cdh_services: "{{ updated_cdh_services | default([]) | union(item) }}"
-      when: regex_findall(rcg_ref_names_requested, item.type) | length > 0
+      when: rcg_ref_names_requested | regex_findall("(?i)" ~ item.type) | length > 0
       loop: "{{ cdh_services }}"
     - debug: var=updated_cdh_services
     - set_fact:
