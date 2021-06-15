@@ -60,7 +60,18 @@
     "ZOOKEEPER-1-SERVER-BASE",
     "KUDU-1-KUDU_MASTER-BASE",
     "SPARK_ON_YARN-1-SPARK_YARN_HISTORY_SERVER-BASE",
-    "YARN-1-GATEWAY-BASE" ]
+    "HUE-1-HUE_SERVER-BASE",
+    "HUE-1-HUE_LOAD_BALANCER-BASE",
+    {% if (krb5_kdc_type is defined) and (krb5_kdc_type != 'none') %}
+    "HUE-1-KT_RENEWER-BASE",
+    {% endif %}
+    "HDFS-1-GATEWAY-BASE",
+    "HDFS-1-HTTPFS-BASE",
+    "HBASE-1-GATEWAY-BASE",
+    "YARN-1-GATEWAY-BASE",
+    "HIVE-1-GATEWAY-BASE",
+    "SPARK_ON_YARN-1-GATEWAY-BASE",
+    "HDFS-1-NFSGATEWAY-BASE" ]
 }, {
   "refName": "HostTemplate-Master1",
   "cardinality": 1,
@@ -151,7 +162,6 @@
     "HIVE-1-HIVEMETASTORE-BASE",
     "HIVE-1-HIVESERVER2-BASE",
     "SENTRY-1-SENTRY_SERVER-BASE",
-    "HDFS-1-GATEWAY-BASE",
     "HBASE-1-HBASERESTSERVER-BASE",
     "HBASE-1-HBASETHRIFTSERVER-BASE" ]
 }, {
@@ -167,12 +177,5 @@
     "SPARK2_ON_YARN-1-GATEWAY-BASE",
     {% endif %}
     "YARN-1-NODEMANAGER-BASE",
-    "KUDU-1-KUDU_TSERVER-BASE",
-    "HDFS-1-HTTPFS-BASE",
-    "HDFS-1-SECONDARYNAMENODE-BASE",
-    "HUE-1-HUE_SERVER-BASE",
-    "HUE-1-HUE_LOAD_BALANCER-BASE",
-    {% if (krb5_kdc_type is defined) and (krb5_kdc_type != 'none') %}
-    "HUE-1-KT_RENEWER-BASE",
-    {% endif %} ]
-    } ]
+    "KUDU-1-KUDU_TSERVER-BASE" ]
+} ]
