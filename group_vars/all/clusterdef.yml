@@ -7,7 +7,7 @@ clusterdef:
       dfs_name_dir_list: /dfs/nn
       dfs_journalnode_edits_dir: /dfs/jn
       autofailover_enabled: "false"
-  cluster_poc:
+  datalake_dev:
     hdfs:
       dfs_data_dir_list: /data/dfs/dn
       fs_checkpoint_dir_list: /data/dfs/snn
