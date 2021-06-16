@@ -13,5 +13,5 @@
 # limitations under the License.
 
 ---
-
+local_temp_dir: "{{ rehost_local_temp_dir | default('/tmp') }}"
 custom_repo_rehost_files: "{{ [scm_repo_tarball_url] }}"
