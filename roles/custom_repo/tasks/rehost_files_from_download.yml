@@ -19,8 +19,17 @@
   loop_control:
     loop_var: __tmp_parcel_dir_item
   ansible.builtin.file:
-    path: "/var/www/html/{{ __tmp_parcel_dir_item | urlsplit('path') | dirname }}"
+    path: "/var/www/html{{ __tmp_parcel_dir_item | urlsplit('path') | dirname }}"
     state: directory
+
+- name: Ensure repo directories exist for file downloads to match required object structure
+  loop: "{{ custom_repo_rehost_files }}"
+  loop_control:
+    loop_var: __tmp_local_parcel_dir_item
+  ansible.builtin.file:
+    path: "{{ local_temp_dir }}{{ __tmp_local_parcel_dir_item | urlsplit('path') | dirname }}"
+    state: directory
+  delegate_to: localhost
 
 - name: Request Async Download of files to tmp dir
   register: __infra_download_parcels_results
