@@ -10,6 +10,16 @@
     - tarball_parcels
     - custom_repo
 
+- name: Prefetch packages repo-as-tarball locally
+  hosts: localhost
+  connection: local
+  become: yes
+  roles:
+    - prefetch_packages
+  tags:
+    - prefetch_packages
+    - custom_repo
+
 - name: Install custom parcel repository
   hosts: custom_repo
   become: yes

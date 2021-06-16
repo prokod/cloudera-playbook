@@ -22,41 +22,6 @@
     path: "/var/www/html{{ __tmp_parcel_dir_item | urlsplit('path') | dirname }}"
     state: directory
 
-- name: Ensure repo directories exist for file downloads to match required object structure
-  loop: "{{ custom_repo_rehost_files }}"
-  loop_control:
-    loop_var: __tmp_local_parcel_dir_item
-  ansible.builtin.file:
-    path: "{{ local_temp_dir }}{{ __tmp_local_parcel_dir_item | urlsplit('path') | dirname }}"
-    state: directory
-  delegate_to: localhost
-
-- name: Request Async Download of files to tmp dir
-  register: __infra_download_parcels_results
-  loop: "{{ custom_repo_rehost_files }}"
-  loop_control:
-    loop_var: __parcel_download_item
-  async: 3600
-  poll: 0
-  ansible.builtin.get_url:
-    url: "{{ __parcel_download_item }}"
-    dest: "{{ local_temp_dir }}{{ __parcel_download_item | urlsplit('path') }}"
-  delegate_to: localhost
-
-- name: Track async downloads to completion  [ This may take a while if your files are very large or far away ]
-  loop: "{{ __infra_download_parcels_results.results }}"
-  loop_control:
-    loop_var: __download_async_item
-  register: __async_download_results
-  until: __async_download_results.finished is defined and __async_download_results.finished
-  delay: 15
-  retries: 300
-  async_status:
-    jid: "{{ __download_async_item.ansible_job_id }}"
-  failed_when:
-    - __download_async_item.failed == True
-    - __download_async_item.finished != 1
-
 - name: Copy tarball to correct location
   copy:
     src: "{{ local_temp_dir }}{{ __tarball_download_item | urlsplit('path') }}"
