@@ -31,7 +31,7 @@
   poll: 0
   ansible.builtin.get_url:
     url: "{{ __parcel_download_item }}"
-    dest: "{{ local_temp_dir }}"
+    dest: "{{ local_temp_dir }}{{ __parcel_download_item | urlsplit('path') }}"
   delegate_to: localhost
 
 - name: Track async downloads to completion  [ This may take a while if your files are very large or far away ]
@@ -50,11 +50,11 @@
 
 - name: Copy tarball to correct location
   copy:
-    src: "{{ __downloaded_item.dest }}"
-    dest: "/var/www/html{{ __downloaded_item.url | urlsplit('path') }}"
-  loop: "{{ __infra_download_parcels_results.results }}"
+    src: "{{ local_temp_dir }}{{ __tarball_download_item | urlsplit('path') }}"
+    dest: "/var/www/html{{ __tarball_download_item | urlsplit('path') }}"
+  loop: "{{ custom_repo_rehost_files }}"
   loop_control:
-    loop_var: __downloaded_item
+    loop_var: __tarball_download_item
 
 - name: Ensure paths for unpacked repo-as-tars
   loop: "{{ custom_repo_rehost_files | select('search', 'tar.gz') | select('search', 'repo-as-tarball') | list }}"
