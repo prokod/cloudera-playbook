@@ -22,14 +22,6 @@
     path: "/var/www/html{{ __tmp_parcel_dir_item | urlsplit('path') | dirname }}"
     state: directory
 
-- name: Copy tarball to correct location
-  copy:
-    src: "{{ local_temp_dir }}{{ __tarball_download_item | urlsplit('path') }}"
-    dest: "/var/www/html{{ __tarball_download_item | urlsplit('path') }}"
-  loop: "{{ custom_repo_rehost_files }}"
-  loop_control:
-    loop_var: __tarball_download_item
-
 - name: Ensure paths for unpacked repo-as-tars
   loop: "{{ custom_repo_rehost_files | select('search', 'tar.gz') | select('search', 'repo-as-tarball') | list }}"
   loop_control:
@@ -44,8 +36,8 @@
     loop_var: __tmp_unpack_item
   ansible.builtin.unarchive:
     extra_opts: [--strip-components=1]
-    remote_src: yes
-    src: "/var/www/html{{ __tmp_unpack_item | urlsplit('path') }}"
+    remote_src: no
+    src: "{{ local_temp_dir }}{{ __tarball_download_item | urlsplit('path') }}"
     dest: "/var/www/html{{ __tmp_unpack_item | urlsplit('path') | regex_replace('^(.+)repo.+-(.+)\\.tar\\.gz$', '\\1\\2' + '/yum/') }}"
     keep_newer: "{{ keep_newer }}"
 
